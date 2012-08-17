@@ -1,0 +1,17 @@
+##
+# Log other program outputs
+#
+LOG=$_ETL_LOG_PATH/`date +%H%M%S-$RANDOM`.log
+$@ &> $LOG
+
+if `cat $LOG | grep -iE "EXCEPTION|FAIL|FATAL|ERROR|Could not open" 1>/dev/null 2>&1`
+then
+    echo Error executing query:
+    tail -n 20 $LOG
+    echo Full log: $LOG
+    echo ' '
+else
+    echo 'Executed query successfully.'
+    tail -n 20 $LOG
+    echo ' '
+fi
