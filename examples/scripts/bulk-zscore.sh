@@ -1,3 +1,4 @@
+source etl.sh
 ##
 # Perform a z-score calculation on a dataset
 
@@ -22,10 +23,15 @@ zscore()
 ##
 # Example routine
 
-echo Starting bulk zscore operation.
-echo "* tags-albums zscores:"
-zscore 'tags_albums' $SOURCE_TSCOMPUTED 'tagid' 'albumid'
-echo "* tags-artists zscores:"
-zscore 'tags_artists' $SOURCE_TSCOMPUTED 'tagid' 'artistid'
-echo "* tags-songs zscores:"
-zscore 'tags_songs' $SOURCE_TSCOMPUTED 'tagid' 'songid'
+main()
+{
+    echo Starting bulk zscore operation.
+    echo "* tags-albums zscores:"
+    zscore 'tags_albums' $SOURCE_TSCOMPUTED 'tagid' 'albumid'
+    echo "* tags-artists zscores:"
+    zscore 'tags_artists' $SOURCE_TSCOMPUTED 'tagid' 'artistid'
+    echo "* tags-songs zscores:"
+    zscore 'tags_songs' $SOURCE_TSCOMPUTED 'tagid' 'songid'
+}
+
+run main

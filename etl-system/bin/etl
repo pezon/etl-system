@@ -1,4 +1,4 @@
-# HIVE Execute
+# HIVE ETL
 # Execute a sequence of HIVE commands
 # Ensure proper logging and mailing
 
@@ -9,31 +9,17 @@ _ETL_ALERT_EMAIL='you@email.com'
 _ETL_HIVE_BIN=$HIVE_HOME/bin/hive
 
 ##
-# Helper functions
+# Environment variables
 #
-basedir()
-{
-    BASEDIR=$(dirname $0)
-    if [ -z "$1" ]
-    then
-        echo `readlink -f $BASEDIR`
-    else
-        echo `readlink -f $BASEDIR/../$1`
-    fi
-}
-
-##
-# Environment variables for run process
-#
+_ETL_BASE_DIR=`readlink -f $(dirname $0)/..`
 export _ETL_EXEC_NAME=`basename $0`
 export _ETL_EXEC_DATE=`date +%Y-%m-%d`
 export _ETL_EXEC_TIME=`date +%H%M`
-export _ETL_LOG_PATH=`basedir log`/$_ETL_EXEC_NAME/$_ETL_EXEC_DATE/$_ETL_EXEC_TIME-$RANDOM
-export _ETL_BIN_PATH=`basedir bin`
-export _ETL_SQL_PATH=`basedir sql`
-export _ETL_SCRIPTS_PATH=`basedir scripts`
-export _ETL_TRANSFORM_PATH=`basedir transform`
-export _ETL_EXEC_LOG=$_ETL_LOG_PATH/$_ETL_EXEC_NAME.log
+export _ETL_LOG_PATH=$_ETL_BASE_DIR/log/$_ETL_EXEC_NAME/$_ETL_EXEC_DATE/$_ETL_EXEC_TIME-$RANDOM
+export _ETL_BIN_PATH=$_ETL_BASE_DIR/bin
+export _ETL_SQL_PATH=$_ETL_BASE_DIR/sq
+export _ETL_SCRIPTS_PATH=$_ETL_BASE_DIR/scripts
+export _ETL_TRANSFORM_PATH=$_ETL_BASE_DIR/transform
 export PATH=$PATH:$_ETL_BIN_PATH:$_ETL_SQL_PATH:$_ETL_TRANSFORM_PATH:$_ETL_LIB_PATH:$_ETL_CONF_PATH
 
 ##
@@ -41,7 +27,7 @@ export PATH=$PATH:$_ETL_BIN_PATH:$_ETL_SQL_PATH:$_ETL_TRANSFORM_PATH:$_ETL_LIB_P
 #
 query()
 {
-    LOG=$_ETL_LOG_PATH/`date +%H%M%S-$RANDOM`.log
+    LOG=$_ETL_LOG_PATH/query-`date +%H%M%S-$RANDOM`.log
     $_ETL_HIVE_BIN\
         -hiveconf hive.root.logger=ERROR,console\
         -hiveconf hive.querylog.location=$_ETL_LOG_PATH/hivelogs\
@@ -63,7 +49,7 @@ fi
 
 log()
 {
-    LOG=$_ETL_LOG_PATH/`date +%H%M%S-$RANDOM`.log
+    LOG=$_ETL_LOG_PATH/log-`date +%H%M%S-$RANDOM`.log
     $@ &> $LOG
 
     if `cat $LOG | grep -iE "EXCEPTION|FAIL|FATAL|ERROR|Could not open" 1>/dev/null 2>&1`
